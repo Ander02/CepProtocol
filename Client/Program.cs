@@ -16,7 +16,7 @@ namespace Client
 
             Console.WriteLine(response);
 
-            client.Send("Message 2");
+            client.Send("Message 11");
 
             var response2 = client.Receive();
 

@@ -18,19 +18,27 @@ public class AsynchronousClient
 
     private string Response { get; set; }
 
-    public void StartClient()
+    private void Connect(string hostname)
     {
-        try
+        connectDone.Reset();
+        if (Socket == null || !Socket.Connected)
         {
-            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            IPAddress ipAddress = ipHostInfo.AddressList.FirstOrDefault();
-            IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
+            var ipAddress = Dns.GetHostEntry(hostname).AddressList.FirstOrDefault();
+            var remoteEndPoint = new IPEndPoint(ipAddress, port);
 
             Socket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
             //Start a Connection and execute callback when Success
-            Socket.BeginConnect(remoteEP, new AsyncCallback(ConnectCallback), Socket);
+            Socket.BeginConnect(remoteEndPoint, new AsyncCallback(ConnectCallback), Socket);
             connectDone.WaitOne();
+        }
+    }
+
+    public void StartClient()
+    {
+        try
+        {
+            Connect(Dns.GetHostName());
         }
         catch (Exception ex)
         {
@@ -56,13 +64,13 @@ public class AsynchronousClient
         }
     }
 
+
     public void Send(string message)
     {
         if (!message.Contains(Constants.EndOfMessage))
             message = $"{message}{Constants.EndOfMessage}";
 
         byte[] messageBytes = Encoding.ASCII.GetBytes(message);
-
 
         Socket.BeginSend(messageBytes, 0, messageBytes.Length, 0, new AsyncCallback(SendCallback), Socket);
         sendDone.Set();

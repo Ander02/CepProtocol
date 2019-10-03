@@ -10,5 +10,5 @@ public class StateObject
     // Receive buffer.  
     public byte[] buffer = new byte[BufferSize];
     // Received data string.  
-    public StringBuilder sb = new StringBuilder();
+    public StringBuilder stringBuilder = new StringBuilder();
 }

@@ -7,7 +7,7 @@ using System.Threading;
 
 public class AsynchronousSocketListener
 {
-    private readonly ManualResetEvent allDone = new ManualResetEvent(false);
+    private readonly ManualResetEvent connectionDone = new ManualResetEvent(false);
 
     private Socket SocketListener { get; set; }
 
@@ -29,14 +29,14 @@ public class AsynchronousSocketListener
             while (true)
             {
                 // Set the event to nonsignaled state.  
-                allDone.Reset();
+                connectionDone.Reset();
 
                 // Start an asynchronous socket to listen for connections.
                 Console.WriteLine("Waiting for a connection...");
                 SocketListener.BeginAccept(new AsyncCallback(AcceptCallback), SocketListener);
 
                 // Wait until a connection is made before continuing.  
-                allDone.WaitOne();
+                connectionDone.WaitOne();
             }
         }
         catch (Exception e)
@@ -60,7 +60,7 @@ public class AsynchronousSocketListener
         };
         socketHandler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCallback), state);
 
-        allDone.Set();
+        connectionDone.Set();
     }
 
     public void ReadCallback(IAsyncResult ar)
@@ -74,9 +74,9 @@ public class AsynchronousSocketListener
 
         if (bytesRead > 0)
         {
-            state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
+            state.stringBuilder.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
 
-            content = state.sb.ToString();
+            content = state.stringBuilder.ToString();
             if (content.IndexOf(Constants.EndOfMessage) > -1)
             {
                 Console.WriteLine("Read {0} bytes from socket. \n Data : {1}", content.Length, content);
@@ -93,11 +93,18 @@ public class AsynchronousSocketListener
 
     private void Send(Socket handler, string data)
     {
-        // Convert the string data to byte data using ASCII encoding.  
-        byte[] byteData = Encoding.ASCII.GetBytes(data);
+        try
+        {
+            // Convert the string data to byte data using ASCII encoding.  
+            byte[] byteData = Encoding.ASCII.GetBytes(data);
 
-        // Begin sending the data to the remote device.  
-        handler.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), handler);
+            // Begin sending the data to the remote device.  
+            handler.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), handler);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 
     private void SendCallback(IAsyncResult ar)
