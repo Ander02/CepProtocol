@@ -1,0 +1,7 @@
+AsyncCliente
+    - port
+    - socket
+    - estadoConexao
+    - connectDone?
+    - sendDone?
+    - receiveDone?
