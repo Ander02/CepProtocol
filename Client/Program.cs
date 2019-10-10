@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Text;
+using System.Threading;
 
 namespace Client
 {
@@ -6,24 +8,37 @@ namespace Client
     {
         public static void Main(string[] args)
         {
-            var client = new AsynchronousClient();
+            new Thread(() =>
+            {
+                Thread.CurrentThread.IsBackground = true;
+                var client = new Client("127.0.0.1", 13000);
 
-            client.StartClient();
+                for (var i = 0; i < 5; i++)
+                {
+                    client.Send($"Hello, I'm Device 1 sending i = {i}", onReceive: (bytes) =>
+                    {
+                        var response = Encoding.ASCII.GetString(bytes);
+                        Console.WriteLine($"Received: {response}");
+                        Thread.Sleep(2000);
+                    });
+                }
+            }).Start();
 
-            client.Send("Message 1");
+            new Thread(() =>
+            {
+                Thread.CurrentThread.IsBackground = true;
+                var client = new Client("127.0.0.1", 13000);
 
-            var response = client.Receive();
-
-            Console.WriteLine(response);
-
-            client.Send("Message 11");
-
-            var response2 = client.Receive();
-
-            Console.WriteLine(response2);
-
-            client.Close();
-
+                for (var i = 0; i < 5; i++)
+                {
+                    client.Send($"Hello, I'm Device 2 sending i = {i}", onReceive: (bytes) =>
+                    {
+                        var response = Encoding.ASCII.GetString(bytes);
+                        Console.WriteLine($"Received: {response}");
+                        Thread.Sleep(2000);
+                    });
+                }
+            }).Start();
             Console.ReadLine();
         }
     }
