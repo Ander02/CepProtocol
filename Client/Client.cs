@@ -17,10 +17,10 @@ namespace Client
         {
             var stream = this.client.GetStream();
 
-            byte[] messageBytes = Encoding.ASCII.GetBytes(message);
+            byte[] messageBytes = ClientConstants.DefaultEncoding.GetBytes(message);
             stream.Write(messageBytes, 0, messageBytes.Length);
             Console.WriteLine($"Sent: {message}");
-            messageBytes = new Byte[2048];
+            messageBytes = new Byte[ClientConstants.BufferSize];
 
             stream.Read(messageBytes, 0, messageBytes.Length);
             onReceive(messageBytes);
@@ -29,7 +29,6 @@ namespace Client
         public void Close()
         {
             client.Close();
-            client.GetStream().Close();
         }
     }
 }

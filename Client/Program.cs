@@ -8,6 +8,36 @@ namespace Client
     {
         public static void Main(string[] args)
         {
+            Run();
+            //RunMultThread();
+        }
+
+        private static void Run()
+        {
+            var client = new Client("127.0.0.1", 13000);
+
+            while (true)
+            {
+                Console.WriteLine("Write your message");
+                var message = Console.ReadLine();
+
+                if (message.Equals("Quit", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    Console.WriteLine("Bye");
+                    break;
+                }
+
+                client.Send(message, onReceive: (bytes) =>
+                {
+                    var response = ClientConstants.DefaultEncoding.GetString(bytes);
+                    Console.WriteLine($"Received: {response.Trim()}");
+                });
+            }                                  
+            client.Close();
+        }
+
+        private static void RunMultThread()
+        {
             new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
@@ -22,6 +52,7 @@ namespace Client
                         Thread.Sleep(2000);
                     });
                 }
+                client.Close();
             }).Start();
 
             new Thread(() =>
@@ -38,6 +69,7 @@ namespace Client
                         Thread.Sleep(2000);
                     });
                 }
+                client.Close();
             }).Start();
             Console.ReadLine();
         }
