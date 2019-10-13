@@ -1,0 +1,4 @@
+UserID;UserIP;CEP;ReturnedAddres;SearchTime;UserIPLocation
+a;b;
+a;b;
+a;1;
