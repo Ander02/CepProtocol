@@ -30,9 +30,9 @@ namespace Client
                 client.Send(message, onReceive: (bytes) =>
                 {
                     var response = ClientConstants.DefaultEncoding.GetString(bytes);
-                    Console.WriteLine($"Received: {response.Trim()}");
+                    Console.WriteLine($"Client Received: {response.Trim()}");
                 });
-            }                                  
+            }
             client.Close();
         }
 

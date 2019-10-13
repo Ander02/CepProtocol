@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Server.Messages;
+using Shared.Messages;
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -41,21 +43,23 @@ namespace Server
             var client = obj as TcpClient;
             var stream = client.GetStream();
 
-            string receivedBytes;
-            byte[] bytes = new byte[2048];
+            string receivedMessage;
+            byte[] bytes = new byte[1 << 16];
             int bit;
             try
             {
                 while ((bit = stream.Read(bytes, 0, bytes.Length)) != 0)
                 {
-                    receivedBytes = Encoding.ASCII.GetString(bytes, 0, bit);
-                    Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId}: Received: {receivedBytes}");
+                    receivedMessage = Encoding.ASCII.GetString(bytes, 0, bit);
+                    Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId}: Server Received: {receivedMessage}");
 
-                    string responseText = $"Hey Device!, I receive {receivedBytes}";
+                    var messageReader = new MessageReader('|');
+
+                    string responseText = MessageHandler.Handle(messageReader.Read(receivedMessage)).GetAwaiter().GetResult();
 
                     Byte[] responseBytes = Encoding.ASCII.GetBytes(responseText);
                     stream.Write(responseBytes, 0, responseBytes.Length);
-                    Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId}: Sent: {responseText}");
+                    Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId}: Server Sent: {responseText}");
                 }
             }
             catch (Exception ex)

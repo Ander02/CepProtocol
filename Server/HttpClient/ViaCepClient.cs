@@ -48,7 +48,7 @@ namespace Server.HttpClient
 
                     //Get response
                     stream.ReadTimeout = 1000;
-                    var data = new byte[2 << 15];
+                    var data = new byte[1 << 16];
                     await stream.ReadAsync(data, 0, data.Length);
 
                     var endOfHeadersIndex = BinarySearch(data, Encoding.ASCII.GetBytes(this.endLine)) + this.GetEndLineBytes();
