@@ -21,7 +21,7 @@ namespace DataBase
         /// no caminho informado no parametro filePath para o buffer DBBuffer
         /// </summary>
         /// <param name="filePath"></param>
-        public DBWriter(String filePath)
+        public DBWriter(String filePath,String Header)
         {
             DBBuffer = new List<List<String>>();
             //System.IO.File.AppendAllText(FilePath, "");
@@ -29,12 +29,12 @@ namespace DataBase
             //Console.WriteLine(FilePath);
             this.File = new System.IO.StreamReader(filePath);
             this.LoadFileToBuffer();
-            Console.WriteLine(this.LastLineIndex);
+            
+            this.DBBuffer.Add((Header.Split(";")).ToList<String>()); // Adiciona o Header a primeira linha do Buffer
             if (this.LastLineIndex == 0)
             {
-
                 this.File.Close();
-                this.WriteHeader();
+                this.WriteHeader(Header);
             }
 
         }
@@ -63,12 +63,13 @@ namespace DataBase
             this.LastLineIndex = i;
         }
 
-        private void WriteHeader()
+        private void WriteHeader(String Header)
         {
-            String Header = "UserID;UserIP;CEP;ReturnedAddres;SearchTime;UserIPLocation;\n"; //Campos do Header
-            this.WriteLineinFile(Header);
-            this.DBBuffer.Add((Header.Split(";")).ToList<String>());
-
+            Header += "\n";
+            //String Header = "UserID;UserIP;CEP;ReturnedAddres;SearchTime;UserIPLocation;\n"; //Campos do Header
+            this.writeLineinFile(Header);
+            
+            
         }
 
         private void WriteLineinFile(String line)
