@@ -11,9 +11,9 @@ namespace DataBase
     /// </summary>
     public class DBWriter
     {
-        private System.IO.StreamReader File; 
+        private System.IO.StreamReader File;
         private String FilePath; // Caminho do arquivo em que o DB é armazenado
-        private List<List<String>> DBBuffer; // Buffer de dados que reflete o arquivo. 
+        private readonly List<List<String>> DBBuffer; // Buffer de dados que reflete o arquivo. 
         private int LastLineIndex; // Numero de registros do banco
 
         /// <summary>
@@ -32,11 +32,11 @@ namespace DataBase
             Console.WriteLine(this.LastLineIndex);
             if (this.LastLineIndex == 0)
             {
-                
+
                 this.File.Close();
                 this.WriteHeader();
             }
-            
+
         }
 
         /// <summary>
@@ -66,16 +66,16 @@ namespace DataBase
         private void WriteHeader()
         {
             String Header = "UserID;UserIP;CEP;ReturnedAddres;SearchTime;UserIPLocation;\n"; //Campos do Header
-            this.writeLineinFile(Header);
+            this.WriteLineinFile(Header);
             this.DBBuffer.Add((Header.Split(";")).ToList<String>());
-            
+
         }
 
-        private void writeLineinFile(String line)
+        private void WriteLineinFile(String line)
         {
 
             System.IO.File.AppendAllText(this.FilePath, line);
-            
+
         }
 
 
@@ -84,15 +84,12 @@ namespace DataBase
         /// </summary>
         /// <param name="lineValues"></param>
         /// <returns></returns>
-        public bool insertLine(String [] lineValues)
+        public bool InsertLine(String[] lineValues)
         {
-            
             this.File.Close();
             if (lineValues.Length > this.DBBuffer[0].Count)
-            {
                 return false;
-            }
-           
+
             try
             {
                 String aux = "";
@@ -101,9 +98,9 @@ namespace DataBase
                     aux += s + ";";
                 }
                 aux += '\n';
-                
-                
-                this.writeLineinFile(aux); // Grava registro no arquivo
+
+
+                this.WriteLineinFile(aux); // Grava registro no arquivo
                 this.DBBuffer.Add(lineValues.ToList<String>()); //Adiciona valor no Buffer
                 this.LastLineIndex++;
                 return true;
@@ -120,16 +117,13 @@ namespace DataBase
         /// </summary>
         public void ShowBuffer()
         {
-            foreach (System.Collections.Generic.List<string> line in this.DBBuffer)
+            foreach (var line in this.DBBuffer)
             {
-                foreach(String element in line)
+                foreach (String element in line)
                 {
-                    Console.Write(element+' ');
+                    Console.Write(element + ' ');
                 }
                 Console.WriteLine("");
-            }
-            {
-
             }
         }
 
@@ -181,12 +175,13 @@ namespace DataBase
         /// <param name="index"></param>
         /// <param name="KeyValue"></param>
         /// <returns></returns>
-        public List<List<String>> GetLines(int index,String KeyValue)
+        public List<List<String>> GetLines(int index, String KeyValue)
         {
             List<List<String>> answer = new List<List<String>>();
-            foreach(List<String> line in this.DBBuffer)
+            foreach (List<String> line in this.DBBuffer)
             {
-                if (line[index].Equals(KeyValue)){
+                if (line[index].Equals(KeyValue))
+                {
                     //Console.WriteLine(line);
                     answer.Add(line);
                 }
