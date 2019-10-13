@@ -4,13 +4,17 @@ using System.Linq;
 
 namespace DataBase
 {
-
+    /// <summary>
+    /// Essa classe e o gerenciador do CSV que simula o DB da aplicacao. Ela possui as funcoes
+    /// que a aplicacao precisa para interagir com a base de dados
+    ///
+    /// </summary>
     public class DBWriter
     {
-        private System.IO.StreamReader File;
-        private String FilePath;
-        private List<List<String>> DBBuffer;
-        private int LastLineIndex;
+        private System.IO.StreamReader File; 
+        private String FilePath; // Caminho do arquivo em que o DB é armazenado
+        private List<List<String>> DBBuffer; // Buffer de dados que reflete o arquivo. 
+        private int LastLineIndex; // Numero de registros do banco
 
         /// <summary>
         /// Construtor da classe que gerencia o txt. Ele inicia carregando o arquivo
@@ -61,7 +65,7 @@ namespace DataBase
 
         private void WriteHeader()
         {
-            String Header = "UserID;UserIP;CEP;ReturnedAddres;SearchTime;UserIPLocation\n";
+            String Header = "UserID;UserIP;CEP;ReturnedAddres;SearchTime;UserIPLocation;\n"; //Campos do Header
             this.writeLineinFile(Header);
             this.DBBuffer.Add((Header.Split(";")).ToList<String>());
             
@@ -88,7 +92,7 @@ namespace DataBase
             {
                 return false;
             }
-            this.DBBuffer.Add(lineValues.ToList<String>());
+           
             try
             {
                 String aux = "";
@@ -97,18 +101,23 @@ namespace DataBase
                     aux += s + ";";
                 }
                 aux += '\n';
-                Console.WriteLine(aux);
                 
-                this.writeLineinFile(aux);
+                
+                this.writeLineinFile(aux); // Grava registro no arquivo
+                this.DBBuffer.Add(lineValues.ToList<String>()); //Adiciona valor no Buffer
+                this.LastLineIndex++;
                 return true;
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Console.WriteLine(e); //Exibe exception (remover nas verssoes finais)
                 return false;
             }
         }
 
+        /// <summary>
+        /// Exibe o buffer no console
+        /// </summary>
         public void ShowBuffer()
         {
             foreach (System.Collections.Generic.List<string> line in this.DBBuffer)
@@ -122,6 +131,67 @@ namespace DataBase
             {
 
             }
+        }
+
+        /// <summary>
+        /// Essa funcao retorna o indica de uma coluna com base no nome passado no parametro.
+        /// A busca nao e case senstive, pois ha uma normalizacao das strings feita dentro da funcao
+        /// </summary>
+        /// <param name="columName"></param>
+        /// <returns></returns>
+        public int GetColumIndex(String columName)
+        {
+            columName = columName.ToUpper();
+            int i = 0;
+            List<String> Header = this.DBBuffer[0];
+            foreach (String element in Header)
+            {
+                String aux = element.ToUpper();
+                if (aux.Equals(columName))
+                {
+                    return i;
+                }
+                i++;
+            }
+            return -1; // Esse valor indica que o columName informado não foi localizado no Header
+        }
+
+        /// <summary>
+        /// Essa funcao retorna um List<List<String>> contendo um subset do DB.
+        /// Esse subset consiste de um filtro que traz somente as linhas em que a coluna
+        /// com o nome infomrado em "columName" possua o valor igual ao valor de KeyValue, 
+        /// ou seja, essa funcao retorna um filtro do DB feito na coluna columName com o valor
+        /// de keyValue
+        /// </summary>
+        /// <param name="columName"></param>
+        /// <param name="KeyValue"></param>
+        /// <returns></returns>
+        public List<List<String>> GetLines(String columName, String KeyValue)
+        {
+            return this.GetLines(this.GetColumIndex(columName), KeyValue);
+        }
+
+        /// <summary>
+        /// Essa funcao retorna um List<List<String>> contendo um subset do DB.
+        /// Esse subset consiste de um filtro que traz somente as linhas em que a coluna
+        /// com o indice informado em index possua o valor igual ao valor de KeyValue, 
+        /// ou seja, essa funcao retorna um filtro do DB feito na coluna do index com o valor
+        /// de keyValue
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="KeyValue"></param>
+        /// <returns></returns>
+        public List<List<String>> GetLines(int index,String KeyValue)
+        {
+            List<List<String>> answer = new List<List<String>>();
+            foreach(List<String> line in this.DBBuffer)
+            {
+                if (line[index].Equals(KeyValue)){
+                    //Console.WriteLine(line);
+                    answer.Add(line);
+                }
+            }
+            return answer;
         }
 
     }
