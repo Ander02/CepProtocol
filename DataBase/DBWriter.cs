@@ -196,5 +196,14 @@ namespace DataBase
             return answer;
         }
 
+        public List<List<String>> GetBuffer()
+        {
+            List<List<String>> buffer = new List<List<String>>();
+            foreach(List<String> line in this.DBBuffer)
+            {
+                buffer.Add(line);
+            }
+            return buffer;
+        }
     }
 }
