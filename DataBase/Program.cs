@@ -1,5 +1,4 @@
 ﻿using System;
-using DataBase;
 using System.Collections.Generic;
 
 namespace DataBase
@@ -9,11 +8,11 @@ namespace DataBase
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
-            String FilePath= "C:\\Users\\Gu\\Desktop\\Gustavo\\USP\\6 semestre\\Redes\\EP\\CepProtocol\\DataBase\\UsersTable.txt";
+            String FilePath = AppDomain.CurrentDomain.BaseDirectory;// "C:\\Users\\Gu\\Desktop\\Gustavo\\USP\\6 semestre\\Redes\\EP\\CepProtocol\\DataBase\\UsersTable.txt";
             String Header= "UserID;UserName;Password;";
             DBWriter DB = new DBWriter(FilePath,Header);
             String [] x= {"user2","jonas","password"};
-            DB.insertLine(x);
+            DB.InsertLine(x);
             //DB.ShowBuffer();
             Console.WriteLine(DB.GetColumIndex("Cep"));
             List<List<String>> c= DB.GetLines("UserId","user2");
