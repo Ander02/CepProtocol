@@ -5,7 +5,7 @@ namespace Shared.Messages
     public class MessageResult
     {
         public string MessageType { get; set; }
-        public List<ValueResult> Values { get; set; }
+        public IEnumerable<ValueResult> Values { get; set; }
 
         public class ValueResult
         {

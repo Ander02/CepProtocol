@@ -7,9 +7,9 @@ namespace Shared.Messages
     {
         private string messageType;
         private char separator;
-        private List<(string fieldName, string fieldValue)> values;
+        private IList<(string fieldName, string fieldValue)> values;
 
-        public MessageBuilder() : this(string.Empty, '|') { }
+        public MessageBuilder() : this(string.Empty, Constants.DefaultSeparator) { }
 
         public MessageBuilder(char separator) : this(string.Empty, separator) { }
 
@@ -35,6 +35,9 @@ namespace Shared.Messages
 
         public string BuildValues()
         {
+            if (!this.values.Any())
+                return string.Empty;
+
             return $"{this.values.Select(d => $"{d.fieldName}={d.fieldValue}").Aggregate((s1, s2) => $"{s1}{separator}{s2}")}";
         }
 

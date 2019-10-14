@@ -15,6 +15,9 @@ namespace Client
 
         public void Send(string message, Action<byte[]> onReceive)
         {
+            if (string.IsNullOrWhiteSpace(message))
+                return;
+            
             var stream = this.client.GetStream();
 
             byte[] messageBytes = ClientConstants.DefaultEncoding.GetBytes(message);

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Text;
@@ -14,16 +15,15 @@ namespace Server.HttpClient
         private readonly string endLine = "\r\n\r\n";
         private readonly string viaCepBaseUri = "viacep.com.br";
         private readonly int port = 443;
-        private readonly string responseContentType = "application/json";
 
-        private int GetEndLineBytes() => Encoding.ASCII.GetBytes(endLine).Length;
+        private int GetEndLineBytes() => Encoding.UTF8.GetBytes(endLine).Length;
 
         /// <summary>
         /// Busca o endereço completo baseado no CEP
         /// </summary>
         /// <param name="cep"></param>
         /// <returns></returns>
-        public async Task<string> GetAddressByCep(string cep)
+        public async Task<ViaCepResult> GetAddressByCep(string cep)
         {
             using (var tcp = new TcpClient(viaCepBaseUri, port))
             {
@@ -42,7 +42,7 @@ namespace Server.HttpClient
                     builder.AppendLine("Upgrade-Insecure-Requests: 1");
                     builder.AppendLine("Sec-Fetch-Site: none");
                     builder.AppendLine();
-                    var requestHeaders = Encoding.ASCII.GetBytes(builder.ToString());
+                    var requestHeaders = Encoding.UTF8.GetBytes(builder.ToString());
                     await stream.WriteAsync(requestHeaders, 0, requestHeaders.Length);
                     await stream.FlushAsync();
 
@@ -51,15 +51,11 @@ namespace Server.HttpClient
                     var data = new byte[1 << 16];
                     await stream.ReadAsync(data, 0, data.Length);
 
-                    var endOfHeadersIndex = BinarySearch(data, Encoding.ASCII.GetBytes(this.endLine)) + this.GetEndLineBytes();
-                    string response = Encoding.UTF8.GetString(data, endOfHeadersIndex, data.Length - endOfHeadersIndex);
+                    var endOfHeadersIndex = BinarySearch(data, Encoding.UTF8.GetBytes(this.endLine)) + this.GetEndLineBytes() * 2;
+                    string responseBody = Encoding.UTF8.GetString(data, endOfHeadersIndex, data.Length - endOfHeadersIndex).Replace("\0", "").Trim();
+                    responseBody = responseBody.Remove(responseBody.Length - 1, 1);
 
-                    //Verify response
-                    var responseHeaders = Encoding.ASCII.GetString(data, 0, endOfHeadersIndex);
-                    if (!responseHeaders.Contains(responseContentType, StringComparison.InvariantCultureIgnoreCase))
-                        response = $"Invalid Content Type but, the response is:\n {response}";
-
-                    return response;
+                    return JsonConvert.DeserializeObject<ViaCepResult>(responseBody);
                 }
             }
         }

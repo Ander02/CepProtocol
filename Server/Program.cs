@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Net;
 using System.Threading;
-using Server.HttpClient;
-using System.Threading.Tasks;
 
 namespace Server
 {
     public class Program
     {
-        public static async Task Main(string[] args)
+        public static void Main(string[] args)
         {
             new Thread(() =>
             {

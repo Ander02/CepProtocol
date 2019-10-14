@@ -20,7 +20,11 @@ namespace Shared.Messages
             var firstParamMessage = separatedFields.FirstOrDefault();
 
             if (!firstParamMessage.Contains("MESSAGE="))
-                return null;
+            {
+                result.MessageType = "INVALID";
+                result.Values = new List<MessageResult.ValueResult>();
+                return result;
+            }
 
             result.MessageType = firstParamMessage.Replace("MESSAGE=", "");
             result.Values = separatedFields.Except(new List<string> { firstParamMessage })
@@ -29,8 +33,7 @@ namespace Shared.Messages
                                            {
                                                Field = d[0],
                                                Value = d[1]
-                                           })
-                                           .ToList();
+                                           });
 
             return result;
         }

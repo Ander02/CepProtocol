@@ -1,4 +1,5 @@
 ﻿using Server.HttpClient;
+using Shared;
 using Shared.Messages;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,7 +10,7 @@ namespace Server.Messages
     {
         public static async Task<string> Handle(MessageResult result)
         {
-            var builder = new MessageBuilder('|');
+            var builder = new MessageBuilder(Constants.DefaultSeparator);
 
             switch (result.MessageType.ToUpper())
             {
@@ -28,22 +29,34 @@ namespace Server.Messages
                     var client = new ViaCepClient();
                     var address = await client.GetAddressByCep(cep);
 
-                    builder.AddField("ADDRESS", address);
+                    if (address.Erro)
+                    {
+                        builder.AddField("SUCESSO", address.Erro.ToString());
+                        builder.AddField("DESCRICAO", "Endereço não encontrado");
+                        break;
+                    }
 
-                    //TODO: Salvar Historico
+                    builder.AddField("CEP", address.Cep);
+                    builder.AddField("LOGRADOURO", address.Logradouro);
+                    builder.AddField("BAIRRO", address.Bairro);
+                    builder.AddField("COMPLEMENTO", address.Complemento);
+                    builder.AddField("CIDADE", address.Localidade);
+                    builder.AddField("UF", address.Uf);
 
-                    return builder.BuildValues();
+                    //TODO: Salvar no Historico
 
+                    break;
                 case "HISTORICO":
                     //TODO: Validador do token gerado e buscar CEP do usuário 
                     break;
 
                 default:
-
+                    builder.AddField("SUCESSO", false.ToString());
+                    builder.AddField("DESCRICAO", "Mensagem inválida");
                     break;
             }
 
-            return string.Empty;
+            return builder.BuildValues();
         }
 
     }

@@ -1,4 +1,5 @@
 ﻿using Server.Messages;
+using Shared;
 using Shared.Messages;
 using System;
 using System.Net;
@@ -50,21 +51,21 @@ namespace Server
             {
                 while ((bit = stream.Read(bytes, 0, bytes.Length)) != 0)
                 {
-                    receivedMessage = Encoding.ASCII.GetString(bytes, 0, bit);
+                    receivedMessage = Encoding.UTF8.GetString(bytes, 0, bit);
                     Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId}: Server Received: {receivedMessage}");
 
-                    var messageReader = new MessageReader('|');
+                    var messageReader = new MessageReader(Constants.DefaultSeparator);
 
                     string responseText = MessageHandler.Handle(messageReader.Read(receivedMessage)).GetAwaiter().GetResult();
 
-                    Byte[] responseBytes = Encoding.ASCII.GetBytes(responseText);
+                    Byte[] responseBytes = Encoding.UTF8.GetBytes(responseText);
                     stream.Write(responseBytes, 0, responseBytes.Length);
                     Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId}: Server Sent: {responseText}");
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine($"Exception: {ex.Message}");
+                Console.WriteLine("Falha na conexão com o cliente");
                 client.Close();
             }
         }
