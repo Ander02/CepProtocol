@@ -25,6 +25,17 @@ namespace Shared.Messages
             this.values.Add((fieldName, fieldValue));
         }
 
+        public void AddSucess()
+        {
+            this.AddField("SUCESSO", true.ToString());
+        }
+
+        public void AddFailure(string descricao)
+        {
+            this.AddField("SUCESSO", false.ToString());
+            this.AddField("DESCRICAO", descricao);
+        }
+
         public string BuildMessage()
         {
             if (string.IsNullOrWhiteSpace(messageType))
