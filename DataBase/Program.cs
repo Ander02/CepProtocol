@@ -3,27 +3,30 @@ using System.Collections.Generic;
 
 namespace DataBase
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
-            String FilePath = AppDomain.CurrentDomain.BaseDirectory;// "C:\\Users\\Gu\\Desktop\\Gustavo\\USP\\6 semestre\\Redes\\EP\\CepProtocol\\DataBase\\UsersTable.txt";
-            String Header= "UserID;UserName;Password;";
-            DBWriter DB = new DBWriter(FilePath,Header);
-            String [] x= {"user2","jonas","password"};
-            DB.InsertLine(x);
+            var filePath = $"{AppDomain.CurrentDomain.BaseDirectory}User.txt";
+            var headers = "UserID;UserName;Password;";
+            var db = new DbWriter(filePath, headers);
+            var line = new string[] { "user2", "jonas", "password" };
+            db.InsertLine(line);
             //DB.ShowBuffer();
-            Console.WriteLine(DB.GetColumIndex("Cep"));
-            List<List<String>> c= DB.GetLines("UserId","user2");
-            showList(c);
+            Console.WriteLine(db.GetColumIndex("Cep"));
+            List<List<String>> c = db.GetLines("UserId", "user2");
+            ShowList(c);
         }
 
-        static void showList(List<List<String>> l){
-            foreach (List<String> line in l){
-                foreach (String value in line){
-                    Console.Write(value+" ");
-                }                        
+        private static void ShowList(List<List<String>> l)
+        {
+            foreach (List<String> line in l)
+            {
+                foreach (String value in line)
+                {
+                    Console.Write(value + " ");
+                }
                 Console.WriteLine();
             }
         }
