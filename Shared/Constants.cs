@@ -2,6 +2,6 @@
 {
     public class Constants
     {
-        public const string EndOfMessage = "<EOF>";
+        public const char DefaultSeparator = '|';
     }
 }
