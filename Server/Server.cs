@@ -63,9 +63,10 @@ namespace Server
                     Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId}: Server Sent: {responseText}");
                 }
             }
-            catch (Exception)
+            catch (Exception E)
             {
                 Console.WriteLine("Falha na conexão com o cliente");
+                Console.WriteLine(E);
                 client.Close();
             }
         }

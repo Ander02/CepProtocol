@@ -5,6 +5,8 @@ using Shared.Messages;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
+
 
 namespace Server.Messages
 {
@@ -13,7 +15,7 @@ namespace Server.Messages
         public static async Task<string> Handle(MessageResult result)
         {
             var builder = new MessageBuilder(Constants.DefaultSeparator);
-            var userDb = new DbWriter($"{AppDomain.CurrentDomain.BaseDirectory}User.csv", "UserId;Username;Password");
+            var userDb = new DbWriter($"{AppDomain.CurrentDomain.BaseDirectory}User.csv", "Username;Password");
             var cepDb = new DbWriter($"{AppDomain.CurrentDomain.BaseDirectory}Cep.csv", "UserId;Cep;Logradouro;Bairro;Complemento;Cidade;Uf;DataBusca");
 
             switch (result.MessageType.ToUpper())
@@ -21,18 +23,30 @@ namespace Server.Messages
                 case "CADASTRAR":
                     {
                         //TODO: Cadastrar usuário no CSV
-                        var username= result.Values.FirstOrDefault(d=> d.Value == "USERNAME")?.Value ;
-                        var password= result.Values.FirstOrDefault(d=> d.Value == "PASSWORD")?.Value ;
+                        Console.WriteLine("AQUI");
+                        
+                        var username = result.Values.FirstOrDefault(d => d.Field == "USERNAME")?.Value;
+                        String password = result.Values.FirstOrDefault(d=> d.Field == "PASSWORD")?.Value;
+                        Console.WriteLine("Password= "+password);
+                        Console.WriteLine("UserName= "+username);
+                        Regex RE=new Regex("@*.com");
                         if(password.Length<8)
                         { 
-                            Console.WriteLine("A senha deve possuir pelo menos 8 caracteres");
+                            builder.AddFailure("A senha deve possuir pelo menos 8 caracteres");
+                        }
+                        else if (!(RE.IsMatch(username))){
+                            builder.AddFailure("Email invalido");
                         }
                         else if (userDb.GetLines("UserId",username).Count()>0)
                         {
-                             Console.WriteLine("Usuario ja cadastrado");
+                            builder.AddFailure("Usuario ja cadastrado");
                         } 
                         else{
-                            userDb.InsertLine();
+                            password=UserHelper.Encrypt(password);
+                            Console.WriteLine(password);
+                            String [] line= {username,password};
+                            Console.WriteLine(userDb.InsertLine(line));
+                            builder.AddSucess();
                         }
                         break;
                     }

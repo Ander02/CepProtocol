@@ -33,6 +33,7 @@ namespace DataBase
         /// <param name="filePath"></param>
         public DbWriter(String filePath, String header)
         {
+            Console.WriteLine(filePath);
             dbBuffer = new List<List<String>>();
             //System.IO.File.AppendAllText(FilePath, "");
             this.filePath = filePath;
@@ -89,6 +90,7 @@ namespace DataBase
 
         private void WriteLineinFile(String line)
         {
+            this.file.Close();
             System.IO.File.AppendAllText(this.filePath, line);
         }
 
