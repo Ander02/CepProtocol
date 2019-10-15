@@ -41,7 +41,7 @@ namespace Shared.Messages
             if (string.IsNullOrWhiteSpace(messageType))
                 return string.Empty;
 
-            return $"MESSAGE={this.messageType}{separator}{BuildValues()}";
+            return $"MESSAGE:{this.messageType}{separator}{BuildValues()}";
         }
 
         public string BuildValues()
@@ -49,7 +49,7 @@ namespace Shared.Messages
             if (!this.values.Any())
                 return string.Empty;
 
-            return $"{this.values.Select(d => $"{d.fieldName}={d.fieldValue}").Aggregate((s1, s2) => $"{s1}{separator}{s2}")}";
+            return $"{this.values.Select(d => $"{d.fieldName}:{d.fieldValue}").Aggregate((s1, s2) => $"{s1}{separator}{s2}")}";
         }
 
         public void CleanValue()

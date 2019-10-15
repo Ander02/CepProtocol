@@ -33,7 +33,7 @@ namespace DataBase
         /// <param name="filePath"></param>
         public DbWriter(String filePath, String header)
         {
-            Console.WriteLine(filePath);
+            //Console.WriteLine(filePath);
             dbBuffer = new List<List<String>>();
             //System.IO.File.AppendAllText(FilePath, "");
             this.filePath = filePath;
@@ -91,9 +91,8 @@ namespace DataBase
         private void WriteLineinFile(String line)
         {
             this.file.Close();
-            System.IO.File.AppendAllText(this.filePath, line);
+            File.AppendAllText(this.filePath, line);
         }
-
 
         /// <summary>
         /// Funcao que insere linhas de dados no arquivo e no buffer
@@ -207,7 +206,7 @@ namespace DataBase
         public List<List<String>> GetBuffer()
         {
             List<List<String>> buffer_aux = new List<List<String>>();
-            foreach(List<String> line in this.dbBuffer)
+            foreach (List<String> line in this.dbBuffer)
             {
                 buffer_aux.Add(line);
             }

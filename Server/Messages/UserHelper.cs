@@ -9,25 +9,29 @@ namespace Server.Messages
     {
         public static string GenerateToken(string userId, int secondsToExpirate)
         {
-            var a = new TokenInfo
+            var tokenInfo = new TokenInfo
             {
                 UserId = userId,
                 ExpirationDate = DateTime.Now.AddSeconds(secondsToExpirate)
             };
 
-            return Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(a)));
+            return Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(tokenInfo)));
         }
 
         public static string ValidateToken(string token)
         {
+            if (string.IsNullOrWhiteSpace(token))
+                return null;
+
             var json = Encoding.UTF8.GetString(Convert.FromBase64String(token));
+
+            if (string.IsNullOrWhiteSpace(json))
+                return null;
 
             var tokenInfo = JsonConvert.DeserializeObject<TokenInfo>(json);
 
-            if (tokenInfo == null || tokenInfo?.ExpirationDate >= DateTime.Now)
-            {
+            if (tokenInfo == null || tokenInfo?.ExpirationDate <= DateTime.Now)
                 return null;
-            }
 
             return tokenInfo.UserId;
         }
@@ -49,9 +53,7 @@ namespace Server.Messages
 
             using (var sha256 = SHA256.Create())
             {
-                var cryptedText = Encoding.UTF8.GetString(sha256.ComputeHash(Encoding.UTF8.GetBytes($"{cryptSalt}{text}{cryptSalt}")));
-
-                return cryptedText;
+                return Encoding.UTF8.GetString(sha256.ComputeHash(Encoding.UTF8.GetBytes($"{cryptSalt}{text}{cryptSalt}")));
             };
         }
     }

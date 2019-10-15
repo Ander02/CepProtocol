@@ -4,9 +4,8 @@ using Shared;
 using Shared.Messages;
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Text.RegularExpressions;
-
+using System.Threading.Tasks;
 
 namespace Server.Messages
 {
@@ -23,41 +22,46 @@ namespace Server.Messages
                 case "CADASTRAR":
                     {
                         //TODO: Cadastrar usuário no CSV
-                        Console.WriteLine("AQUI");
-                        
-                        var username = result.Values.FirstOrDefault(d => d.Field == "USERNAME")?.Value;
-                        String password = result.Values.FirstOrDefault(d=> d.Field == "PASSWORD")?.Value;
-                        Console.WriteLine("Password= "+password);
-                        Console.WriteLine("UserName= "+username);
-                        Regex RE=new Regex("@*.com");
-                        if(password.Length<8)
-                        { 
+                        var username = result.GetFieldValue("USERNAME");
+                        var password = result.GetFieldValue("PASSWORD");
+
+                        if (string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(username))
+                        {
+                            builder.AddFailure("Usuário ou senha estão vazios ou nulos");
+                        }
+                        else if (password.Length < 8)
+                        {
                             builder.AddFailure("A senha deve possuir pelo menos 8 caracteres");
                         }
-                        else if (!(RE.IsMatch(username))){
-                            builder.AddFailure("Email invalido");
-                        }
-                        else if (userDb.GetLines("UserId",username).Count()>0)
+                        else
                         {
-                            builder.AddFailure("Usuario ja cadastrado");
-                        } 
-                        else{
-                            password=UserHelper.Encrypt(password);
-                            Console.WriteLine(password);
-                            String [] line= {username,password};
-                            Console.WriteLine(userDb.InsertLine(line));
-                            builder.AddSucess();
+                            var emailRegex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
+                            if (!emailRegex.Match(username).Success)
+                            {
+                                builder.AddFailure("Email invalido");
+                            }
+                            else if (userDb.GetLines("Username", username).Count() > 0)
+                            {
+                                builder.AddFailure("Usuario ja cadastrado");
+                            }
+                            else
+                            {
+                                password = UserHelper.Encrypt(password);
+                                Console.WriteLine(userDb.InsertLine(new string[] { username, password }));
+                                builder.AddSucess();
+                            }
                         }
+
                         break;
                     }
                 case "LOGIN":
                     {
-                        var username = result.Values.FirstOrDefault(d => d.Value == "USERNAME")?.Value;
-                        var password = result.Values.FirstOrDefault(d => d.Value == "PASSWORD")?.Value;
-                        var tempoDeConexaoStr = result.Values.FirstOrDefault(d => d.Value == "TEMPO_DE_CONEXAO")?.Value;
+                        var username = result.GetFieldValue("USERNAME");
+                        var password = result.GetFieldValue("PASSWORD");
+                        var connectionDurationStr = result.GetFieldValue("CONNECTION_DURATION");
 
-                        Int32.TryParse(tempoDeConexaoStr, out int tempoDeConexao);
-                        if (tempoDeConexao <= 0)
+                        Int32.TryParse(connectionDurationStr, out int connectionDuration);
+                        if (connectionDuration <= 0)
                         {
                             builder.AddFailure("Tempo de conexão inválido");
                             break;
@@ -79,7 +83,7 @@ namespace Server.Messages
 
                         var user = userLines.FirstOrDefault();
 
-                        if (user == null || !UserHelper.PasswordEquals(user[2], UserHelper.Encrypt(password)))
+                        if (user == null || !UserHelper.PasswordEquals(password, user[1]))
                         {
                             builder.AddFailure("Usuário ou senha inválidos");
                             break;
@@ -87,13 +91,13 @@ namespace Server.Messages
 
                         builder.AddSucess();
 
-                        builder.AddField("TOKEN", UserHelper.GenerateToken(user[0], 30));
+                        builder.AddField("TOKEN", UserHelper.GenerateToken(user[0], connectionDuration));
 
                         break;
                     }
                 case "CEP":
                     {
-                        var token = result.Values.FirstOrDefault(d => d.Field == "TOKEN")?.Value;
+                        var token = result.GetFieldValue("TOKEN");
 
                         var userId = UserHelper.ValidateToken(token);
 
@@ -103,9 +107,9 @@ namespace Server.Messages
                             break;
                         }
 
-                        var cep = result.Values.FirstOrDefault(d => d.Field == "CEP")?.Value;
+                        var cep = result.GetFieldValue("CEP");
                         var client = new ViaCepClient();
-                        var address = await client.GetAddressByCep(token);
+                        var address = await client.GetAddressByCep(cep);
 
                         if (address.Erro)
                         {
@@ -127,7 +131,7 @@ namespace Server.Messages
                     }
                 case "HISTORICO":
                     {
-                        var token = result.Values.FirstOrDefault(d => d.Field == "TOKEN")?.Value;
+                        var token = result.GetFieldValue("TOKEN");
 
                         var userId = UserHelper.ValidateToken(token);
 

@@ -18,27 +18,39 @@ namespace Client
         {
             Console.WriteLine("Olá, bem vindo ao CepProtocol - Client");
 
-            string serverIp;
-            var ipRegexp = new Regex(@"^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$");
+            Client client = default;
+            var tryAgain = false;
             do
             {
-                serverIp = ReadLine("Digite o ip do servidor que deseja acessar");
-            } while (!ipRegexp.Match(serverIp).Success);
+                try
+                {
+                    string serverIp;
+                    var ipRegexp = new Regex(@"^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$");
+                    do
+                    {
+                        serverIp = ReadLine("Digite o ip do servidor que deseja acessar");
+                    } while (!ipRegexp.Match(serverIp).Success);
 
-            int serverPort;
-            do
-            {
-                serverPort = ReadIntLine("Digite a porta do servidor que deseja acessar");
-            } while (serverPort <= 0);
+                    int serverPort;
+                    do
+                    {
+                        serverPort = ReadIntLine("Digite a porta do servidor que deseja acessar");
+                    } while (serverPort <= 0);
 
-            var client = new Client(serverIp, serverPort);
+                    client = new Client(serverIp, serverPort);
+                    Console.WriteLine($"Você agora está conectado à {serverIp}:{serverPort}");
+                    tryAgain = false;
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("Não foi possível conectar-se ao servidor, tente novamente");
+                    tryAgain = true;
+                }
+            } while (tryAgain);
 
             while (true)
             {
                 int option;
-
-                Console.WriteLine($"Você agora está conectado à {serverIp}:{serverPort}");
-
                 Console.WriteLine("O que gostaria de fazer à seguir:");
 
                 Console.WriteLine("1 - AJUDA");
@@ -134,13 +146,13 @@ Index=1|CEP=01001001|Logradouro=Praça da Sé|Complemento=Lado Par|Bairro=Sé|Ci
 
 
 
-
+        //Tests code
 
 
 
         private static void RunTest()
         {
-            var client = new Client("127.0.0.1", 13000);
+            var client = new Client("127.0.0.1", 4242);
 
             while (true)
             {
@@ -167,7 +179,7 @@ Index=1|CEP=01001001|Logradouro=Praça da Sé|Complemento=Lado Par|Bairro=Sé|Ci
             new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
-                var client = new Client("127.0.0.1", 13000);
+                var client = new Client("127.0.0.1", 4242);
 
                 for (var i = 0; i < 5; i++)
                 {
@@ -184,7 +196,7 @@ Index=1|CEP=01001001|Logradouro=Praça da Sé|Complemento=Lado Par|Bairro=Sé|Ci
             new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
-                var client = new Client("127.0.0.1", 13000);
+                var client = new Client("127.0.0.1", 4242);
 
                 for (var i = 0; i < 5; i++)
                 {

@@ -10,11 +10,11 @@ namespace Server
         {
             new Thread(() =>
             {
-                var server = new Server(IPAddress.Parse("127.0.0.1"), 13000);
+                var server = new Server(IPAddress.Parse("127.0.0.1"), 4242);
                 server.Start();
             }).Start();
 
-            Console.WriteLine("Server Started...!");
+            Console.WriteLine("Server Started!");
         }
     }
 }

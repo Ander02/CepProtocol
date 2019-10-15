@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Shared.Messages
 {
@@ -6,6 +8,9 @@ namespace Shared.Messages
     {
         public string MessageType { get; set; }
         public IEnumerable<ValueResult> Values { get; set; }
+
+        public string GetFieldValue(string field)
+            => this.Values.FirstOrDefault(d => d.Field.Equals(field, StringComparison.InvariantCultureIgnoreCase))?.Value;
 
         public class ValueResult
         {

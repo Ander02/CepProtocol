@@ -27,7 +27,7 @@ namespace Server
                 {
                     Console.WriteLine("Waiting for a connection...");
                     var client = server.AcceptTcpClient();
-                    Console.WriteLine("Connected!");
+                    Console.WriteLine("Receiveid a connection!");
                     var thread = new Thread(new ParameterizedThreadStart(Handle));
                     thread.Start(client);
                 }
@@ -54,19 +54,26 @@ namespace Server
                     receivedMessage = Encoding.UTF8.GetString(bytes, 0, bit);
                     Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId}: Server Received: {receivedMessage}");
 
-                    var messageReader = new MessageReader(Constants.DefaultSeparator);
-
-                    string responseText = MessageHandler.Handle(messageReader.Read(receivedMessage)).GetAwaiter().GetResult();
+                    string responseText = default;
+                    try
+                    {
+                        var messageReader = new MessageReader(Constants.DefaultSeparator);
+                        responseText = MessageHandler.Handle(messageReader.Read(receivedMessage)).GetAwaiter().GetResult();
+                    }
+                    catch (Exception)
+                    {
+                        responseText = "Não foi possível ler a mensagem, tente novamente";
+                    }
 
                     Byte[] responseBytes = Encoding.UTF8.GetBytes(responseText);
                     stream.Write(responseBytes, 0, responseBytes.Length);
                     Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId}: Server Sent: {responseText}");
                 }
             }
-            catch (Exception E)
+            catch (Exception ex)
             {
                 Console.WriteLine("Falha na conexão com o cliente");
-                Console.WriteLine(E);
+                Console.WriteLine(ex);
                 client.Close();
             }
         }

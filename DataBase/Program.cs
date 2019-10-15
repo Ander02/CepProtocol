@@ -21,9 +21,9 @@ namespace DataBase
 
         private static void ShowList(List<List<String>> l)
         {
-            foreach (List<String> line in l)
+            foreach (var line in l)
             {
-                foreach (String value in line)
+                foreach (var value in line)
                 {
                     Console.Write(value + " ");
                 }
@@ -31,5 +31,4 @@ namespace DataBase
             }
         }
     }
-
 }

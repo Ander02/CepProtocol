@@ -19,16 +19,16 @@ namespace Shared.Messages
 
             var firstParamMessage = separatedFields.FirstOrDefault();
 
-            if (!firstParamMessage.Contains("MESSAGE="))
+            if (!firstParamMessage.Contains("MESSAGE:"))
             {
                 result.MessageType = "INVALID";
                 result.Values = new List<MessageResult.ValueResult>();
                 return result;
             }
 
-            result.MessageType = firstParamMessage.Replace("MESSAGE=", "");
+            result.MessageType = firstParamMessage.Replace("MESSAGE:", "");
             result.Values = separatedFields.Except(new List<string> { firstParamMessage })
-                                           .Select(d => d.Split('='))
+                                           .Select(d => d.Split(':'))
                                            .Select(d => new MessageResult.ValueResult
                                            {
                                                Field = d[0],
