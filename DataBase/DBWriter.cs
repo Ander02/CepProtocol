@@ -12,7 +12,7 @@ namespace DataBase
     /// </summary>
     public class DbWriter
     {
-        private readonly StreamReader file;
+        //private readonly StreamReader file;
         /// <summary>
         /// Caminho do arquivo em que o Db é armazenado
         /// </summary>
@@ -45,14 +45,14 @@ namespace DataBase
                 file.Close();
             }
 
-            this.file = new StreamReader(filePath);
+            //this.file = new StreamReader(filePath);
 
-            this.LoadFileToBuffer();
+            this.LoadFileToBuffer(filePath);
 
             this.dbBuffer.Add((header.Split(";")).ToList<String>()); // Adiciona o Header a primeira linha do Buffer
+            //this.file.Close();
             if (this.lastLineIndex == 0)
             {
-                this.file.Close();
                 this.WriteHeader(header);
             }
         }
@@ -60,25 +60,26 @@ namespace DataBase
         /// <summary>
         /// Funcao responsavel por carregar os dados do arquivo para o DBBuffer. Ela é chamada no construtor
         /// </summary>
-        private void LoadFileToBuffer()
+        private void LoadFileToBuffer(string filePath)
         {
-            int i = 0;
-            while (true)
+            using (var file = new StreamReader(filePath))
             {
-                String line = file.ReadLine();
-                if (line == null)
+                int i = 0;
+                while (true)
                 {
-                    break;
+                    String line = file.ReadLine();
+                    if (line != null)
+                    {
+                        String[] aux = line.Split(";");
+                        List<String> aux2 = aux.ToList<String>();
+                        this.dbBuffer.Add(aux2);
+
+                    }
+                    else break;
+                    i++;
                 }
-                else
-                {
-                    String[] aux = line.Split(";");
-                    List<String> aux2 = aux.ToList<String>();
-                    this.dbBuffer.Add(aux2);
-                }
-                i++;
+                this.lastLineIndex = i;
             }
-            this.lastLineIndex = i;
         }
 
         private void WriteHeader(String Header)
@@ -90,7 +91,7 @@ namespace DataBase
 
         private void WriteLineinFile(String line)
         {
-            this.file.Close();
+            //this.file.Close();
             File.AppendAllText(this.filePath, line);
         }
 
@@ -101,7 +102,7 @@ namespace DataBase
         /// <returns></returns>
         public bool InsertLine(String[] lineValues)
         {
-            this.file.Close();
+            //this.file.Close();
             if (lineValues.Length > this.dbBuffer[0].Count)
                 return false;
 
@@ -151,8 +152,8 @@ namespace DataBase
         {
             columName = columName.ToUpper();
             int i = 0;
-            List<String> Header = this.dbBuffer[0];
-            foreach (String element in Header)
+            List<String> headers = this.dbBuffer[0];
+            foreach (String element in headers)
             {
                 String aux = element.ToUpper();
                 if (aux.Equals(columName))
