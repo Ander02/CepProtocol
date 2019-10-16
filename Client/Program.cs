@@ -86,43 +86,43 @@ namespace Client
 
         private static void HandleHelp()
         {
-            Console.WriteLine(@"Os campos do protocolo podem ser definidos da seguinte forma:
-MENSAGEM=valor|CAMPO1=valor|CAMPO2=valor|...|CAMPOn=valor
-
-Sendo que para o uso de todas as mensagens é necessário obter um token de autenticação, através da mensagem de Login, especificada abaixo:
+            Console.WriteLine(@"As mensagens do protocolo seguem o seguinte padrão:
+	                            MESSAGE:valor|CAMPO1:valor|CAMPO2:valor| … |CAMPOn:valor
 
 LOGIN
-Campos: Usuario <string>, Senha <string>
+Campos: USERNAME <String>, PASSWORD<String>, CONNECTION_DURATION<int>
 Exemplo:
-MENSAGEM=LOGIN|Usuario=User|Senha=UmaSenhaSeguraEncriptada
-Resposta: Sucesso <bool>, Token <string> (virá vazio caso sucesso for falso) 
-Exemplo:
-Sucesso=true|Token=sahasdhawiwqhosfbjdfadiufnjsafkoasduoadnasdkçauad
+MESSAGE:LOGIN|USERNAME:”User”|PASSWORD: “UmaSenhaSegura”|CONNECTION_DURATION:300
 
-As outras mensagens cobertas pelo protocolo são:
+A MESSAGE de resposta segue o seguinte padrão:
+Resposta: Sucesso <bool>, Token <String> (vazio caso sucesso for falso)
+Exemplo:
+Sucesso:true|TOKEN:”SequênciaDeAlfanuméricos”
 
 CADASTRAR
-Campos: Usuario <string>, Senha <string>, TempoDeConexao <int> (em segundos)
+Campos: USERNAME<String>, PASSWORD<String>
 Exemplo:
-MENSAGEM=CADASTRAR|Usuario=User|Senha=UmaSenhaSeguraEncriptada|TempoDeConexao=30
-	Resposta: Sucesso <bool>, Descricao <string>
-Sucesso=true|Descricao=Cadastrado com Sucesso
+MESSAGE:CADASTRAR|USERNAME:”email@email.com”|Senha:”UmaSenhaSegura”
+Padrão de resposta: Sucesso <bool>
+Exemplo:
+Sucesso:true
 
 CEP
-Campos: CEP <string>, Token <string> (Token de autenticação obtido pelo Login)
+Campos: CEP <String>, TOKEN <String> (Token de autenticação obtido pelo Login)
 Exemplo:
-MENSAGEM=CEP|CEP=01001000|Token=sahasdhawiwqhosfbjdfadiufnjsafkoasduoadnasdkçauadsbjasds
-Resposta: CEP <string>, Logradouro<string>, Complemento <string>, Bairro <string>, Cidade <string>, UF <string>
-CEP=01001000|Logradouro=Praça da Sé|Complemento=Lado Ímpar|Bairro=Sé|Cidade=São Paulo|UF=SP
+MESSAGE:CEP|CEP:”01001000”|TOKEN:”SequênciaDeAlfanuméricos”
+Padrão de resposta: CEP <String>, LOGRADOURO<String>, COMPLEMENTO<String>, BAIRRO<String>, CIDADE<String>, UF <String>
+Exemplo: 
+CEP:”01001000”|LOGRADOURO:”Praça da Sé”|COMPLEMENTO:”Lado Ímpar”|BAIRRO:”Sé”|CIDADE:”São Paulo”|UF:”SP”
 
 HISTÓRICO
-Campos: Token <string>
+Campos: Token <String>
 Exemplo:
-MENSAGEM=HISTORICO|Token=sahasdhawiwqhosfbjdfadiufnjsafkoasduoadnasdkçauadsbjasds
-	Resposta: Lista de Resultados da Consulta CEP, na seguinte forma:
-Index<int>, CEP <string>, Logradouro<string>, Complemento <string>, Bairro <string>, Cidade <string>, UF <string>, Data <DateTime>
-Index=0|CEP=01001000|Logradouro=Praça da Sé|Complemento=Lado Ímpar|Bairro=Sé|Cidade=São Paulo|UF=SP|Data=01/10/2019 12:59:00
-Index=1|CEP=01001001|Logradouro=Praça da Sé|Complemento=Lado Par|Bairro=Sé|Cidade=São Paulo|UF=SP|Data=01/10/2019 12:59:00
+MESSAGE:HISTORICO|TOKEN:”SequênciaDeAlfanuméricos”
+Padrão de resposta: Lista de resultados da consulta CEP, na seguinte forma: Index <int>, CEP <String>, Logradouro <String>, Complemento <String>, Bairro <String>, Cidade <String>, UF <String>, Data <DateTime>
+Exemplo:
+Index:0|CEP:”01001000”|Logradouro:”Praça da Sé”|Complemento:”Lado Ímpar”|Bairro:”Sé”|Cidade:”São Paulo”|UF:”SP”|Data:01/10/2019 12:59:00
+Index:1|CEP:”01001001”|Logradouro:”Praça da Sé”|Complemento:”Lado Par”|Bairro:”Sé”|Cidade:”São Paulo”|UF:”SP”|Data:01/10/2019 12:59:00
 ");
         }
 
