@@ -24,6 +24,7 @@ namespace Server.Messages
                         //TODO: Cadastrar usuário no CSV
                         var username = result.GetFieldValue("USERNAME");
                         var password = result.GetFieldValue("PASSWORD");
+                        
 
                         if (string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(username))
                         {
@@ -59,8 +60,9 @@ namespace Server.Messages
                         var username = result.GetFieldValue("USERNAME");
                         var password = result.GetFieldValue("PASSWORD");
                         var connectionDurationStr = result.GetFieldValue("CONNECTION_DURATION");
-
+                       
                         Int32.TryParse(connectionDurationStr, out int connectionDuration);
+                        
                         if (connectionDuration <= 0)
                         {
                             builder.AddFailure("Tempo de conexão inválido");
