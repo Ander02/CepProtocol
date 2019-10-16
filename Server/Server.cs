@@ -60,8 +60,9 @@ namespace Server
                         var messageReader = new MessageReader(Constants.DefaultSeparator);
                         responseText = MessageHandler.Handle(messageReader.Read(receivedMessage)).GetAwaiter().GetResult();
                     }
-                    catch (Exception)
+                    catch (Exception E)
                     {
+                        Console.WriteLine(E);
                         responseText = "Não foi possível ler a mensagem, tente novamente";
                     }
 
