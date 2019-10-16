@@ -55,7 +55,7 @@ namespace DataBase
             {
                 this.WriteHeader(header);
             }
-            this.file.Close();
+            //this.file.Close();
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace DataBase
                 this.WriteLineinFile(aux); // Grava registro no arquivo
                 this.dbBuffer.Add(lineValues.ToList<String>()); //Adiciona valor no Buffer
                 this.lastLineIndex++;
-                this.file.Close();
+                //this.file.Close();
                 return true;
             }
             catch (Exception e)
